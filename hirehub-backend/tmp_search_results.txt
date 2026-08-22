@@ -1,0 +1,62 @@
+﻿C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.controller.ts:52:   @Get('verify-token')
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.controller.ts:54:   async verifyToken(@Request() req) {
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.controller.ts:59:   // 1. REGISTER -> tempToken
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.controller.ts:68:   // 2. VERIFY OTP -> main token
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.controller.ts:70:   @Post('verify-otp')
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.controller.ts:72:   async verifyOtp(
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.controller.ts:77:       return this.authService.verifyOtpByEmail(body.email, body.otp);
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.controller.ts:88:       return this.authService.verifyOtp(decoded.sub, body.otp);
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.controller.ts:276:   // Step 1 — email  -> tempToken 
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.controller.ts:286:   // Header: Authorization: Bearer {tempToken}
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:37:   private generateOtp(): { otp: string; otpExpiry: Date } {
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:39:     const otpExpiry = new Date();
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:40:     otpExpiry.setMinutes(otpExpiry.getMinutes() + 2);
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:41:     return { otp, otpExpiry };
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:55:   private async generateTempToken(userId: string, email: string, role: string) {
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:75:   private async sendOtpEmail(
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:107:     user: { otpCode: string | null; otpExpiry: Date | null },
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:110:     if (!user.otpCode || !this.safeOtpCompare(user.otpCode, inputOtp)) {
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:113:     if (!user.otpExpiry || new Date() > user.otpExpiry) {
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:119:   // 1. REGISTER -> Returns tempToken (developer) + saves email (frontend)
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:127:     const { otp, otpExpiry } = this.generateOtp();
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:151:             isVerified: false,
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:152:             otpCode: otp,
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:153:             otpExpiry: otpExpiry,
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:176:           isVerified: false,
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:177:           otpCode: otp,
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:178:           otpExpiry,
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:195:     await this.sendOtpEmail(
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:197:       'Verify Your Email - HireHubJA',
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:203:     // tempToken
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:204:     const tempToken = await this.generateTempToken(
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:212:       message: 'Registration successful. Please verify your email.',
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:213:       tempToken,
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:218:   // 2a. VERIFY OTP — by userId (token flow — developer/Postman)
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:220:   async verifyOtp(userId: string, otp: string) {
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:228:       data: { isVerified: true, otpCode: null, otpExpiry: null },
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:231:     const tempToken = await this.generateTempToken(user.id, user.email, user.role);
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:235:       tempToken,
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:241:   // 2b. VERIFY OTP — by email (email flow — frontend)
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:243:   async verifyOtpByEmail(email: string, otp: string) {
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:251:       data: { isVerified: true, otpCode: null, otpExpiry: null },
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:254:     const tempToken = await this.generateTempToken(user.id, user.email, user.role);
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:258:       tempToken,
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:274:     const { otp, otpExpiry } = this.generateOtp();
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:277:       data: { otpCode: otp, otpExpiry },
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:280:     await this.sendOtpEmail(user.email, 'New OTP - HireHubJA', 'New OTP Code', otp);
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:281:     const tempToken = await this.generateTempToken(user.id, user.email, user.role);
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:283:     return { success: true, message: 'OTP resent successfully.', tempToken };
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:640:     if (!user.isVerified) throw new ForbiddenException('Please verify your email first.');
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:840:   // 14b. FORGOT PASSWORD -> Returns tempToken
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:846:     if (!user.isVerified) {
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:847:       throw new ForbiddenException('Please verify your email first before resetting password.');
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:850:     const { otp, otpExpiry } = this.generateOtp();
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:854:       data: { otpCode: otp, otpExpiry },
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:857:     await this.sendOtpEmail(
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:864:     const tempToken = await this.generateTempToken(user.id, user.email, user.role);
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:869:       tempToken,
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:876:   // Header: Authorization: Bearer {tempToken}
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:888:         otpCode: null,
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\auth\auth.service.ts:889:         otpExpiry: null,
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\employer\employer.service.ts:433:                   isVerified: true,
+C:\Users\junay\Desktop\HireHubJA\hirehubja-backend\HireHubJA-Backend\src\messages\messages.gateway.ts:40:       const payload = this.jwtService.verify(token, {

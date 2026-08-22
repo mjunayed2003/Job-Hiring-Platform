@@ -1,0 +1,201 @@
+import {
+    Injectable,
+    UnauthorizedException,
+    ForbiddenException,
+    NotFoundException,
+    ConflictException,
+    BadRequestException,
+} from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
+
+import { LoginDto } from './dto/auth.dto';
+import { CreateAdminDto } from './dto/create-admin.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { UserRole, UserStatus } from '../../generated/prisma/client';
+
+@Injectable()
+export class AdminAuthService {
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly jwtService: JwtService,
+    ) { }
+
+    // OTP/email helper methods removed — admins are auto-verified on creation.
+
+
+     // ─────────────────────────────────────────────────────
+    // GET ALL ADMINS
+    // ─────────────────────────────────────────────────────
+    async getAllAdmins() {
+        const admins = await this.prisma.user.findMany({
+            where: {
+                role: UserRole.ADMIN,
+            },
+            include: {
+                adminProfile: true,
+            },
+        });
+
+        return admins.map(admin => {
+            const { password, ...result } = admin;
+            return {
+                id: result.id,
+                email: result.email,
+                role: result.role,
+                status: result.status,
+                fullName: result.adminProfile?.fullName ?? null,
+                profilePic: result.adminProfile?.profilePic ?? null,
+                phone: result.adminProfile?.phone ?? null,
+                location: result.adminProfile?.location ?? null,
+            };
+        });
+    }
+
+    // ─────────────────────────────────────────────────────
+    // ADMIN LOGIN
+    // ─────────────────────────────────────────────────────
+    async adminLogin(dto: LoginDto) {
+        const user = await this.prisma.user.findUnique({
+            where: { email: dto.email },
+            include: { adminProfile: true },
+        });
+
+        if (!user) throw new UnauthorizedException('Invalid email or password');
+
+        if (user.role !== UserRole.ADMIN) {
+            throw new ForbiddenException('Access denied. Admin only.');
+        }
+
+        const isPasswordValid = await bcrypt.compare(dto.password, user.password);
+        if (!isPasswordValid) throw new UnauthorizedException('Invalid email or password');
+
+        if (!user.isVerified) {
+            throw new ForbiddenException('Please verify your email first.');
+        }
+
+        if (user.status === UserStatus.BLOCKED) {
+            throw new ForbiddenException('Your admin account has been blocked.');
+        }
+
+        const payload = {
+            sub: user.id,
+            email: user.email,
+            role: user.role,
+            tokenVersion: user.tokenVersion,
+        };
+        const token = await this.jwtService.signAsync(payload, { expiresIn: '60d' });
+
+        return {
+            message: 'Admin login successful',
+            access_token: token,
+            user: {
+                id: user.id,
+                email: user.email,
+                role: user.role,
+                fullName: user.adminProfile?.fullName ?? '',
+                profilePic: user.adminProfile?.profilePic ?? null,
+                phone: user.adminProfile?.phone ?? null,
+                location: user.adminProfile?.location ?? null,
+            },
+        };
+    }
+
+    // ─────────────────────────────────────────────────────
+    // ADD NEW ADMIN
+    // ─────────────────────────────────────────────────────
+    async createAdmin(dto: CreateAdminDto) {
+        const existing = await this.prisma.user.findUnique({
+            where: { email: dto.email },
+        });
+        if (existing) throw new ConflictException('Email already exists');
+
+        const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+        const newAdmin = await this.prisma.user.create({
+            data: {
+                email: dto.email,
+                password: hashedPassword,
+                role: UserRole.ADMIN,
+                status: UserStatus.ACTIVE,
+                isVerified: true,
+                adminProfile: {
+                    create: {
+                        fullName: dto.fullName,
+                    },
+                },
+            },
+            include: { adminProfile: true },
+        });
+
+        const { password, ...result } = newAdmin;
+        return {
+            message: 'New admin created successfully.',
+            admin: {
+                id: result.id,
+                email: result.email,
+                role: result.role,
+                status: result.status,
+                isVerified: result.isVerified,
+                fullName: result.adminProfile?.fullName,
+            },
+        };
+    }
+
+
+
+    async deleteAdmin(targetId: string, requesterId: string) {
+        // connot delete self
+        if (targetId === requesterId) {
+            throw new ForbiddenException('You cannot delete your own account');
+        }
+
+        // chack admin exist admin
+        const admin = await this.prisma.user.findUnique({
+            where: { id: targetId },
+            include: { adminProfile: true },
+        });
+
+        if (!admin) throw new NotFoundException('Admin not found');
+
+        if (admin.role !== UserRole.ADMIN) {
+            throw new ForbiddenException('Target user is not an admin');
+        }
+
+        // Delete  Cascade and adminProfile
+        await this.prisma.user.delete({ where: { id: targetId } });
+
+        return {
+            message: `Admin deleted successfully`,
+        };
+    }
+
+
+
+
+
+// ─────────────────────────────────────────────────────
+// CHANGE PASSWORD
+// ─────────────────────────────────────────────────────
+    async changePassword(userId: string, dto: ChangePasswordDto) {
+  if (dto.newPassword !== dto.confirmPassword) {
+    throw new BadRequestException('Passwords do not match');
+  }
+
+  const user = await this.prisma.user.findUnique({ where: { id: userId } });
+  if (!user) throw new NotFoundException('User not found');
+
+  const isMatch = await bcrypt.compare(dto.currentPassword, user.password);
+  if (!isMatch) throw new BadRequestException('Current password is incorrect');
+
+  const hashed = await bcrypt.hash(dto.newPassword, 10);
+  await this.prisma.user.update({
+    where: { id: userId },
+    data: { password: hashed },
+  });
+
+  return { success: true, message: 'Password changed successfully' };
+}
+
+}
